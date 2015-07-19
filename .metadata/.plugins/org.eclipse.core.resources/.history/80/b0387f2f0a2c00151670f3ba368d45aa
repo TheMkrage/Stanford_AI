@@ -1,0 +1,77 @@
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.TreeSet;
+
+public class Main {
+	static int MAX_COMMANDS = 0;
+	static int START_SIDE_SIZE = 6;
+	static int END_SIDE_SIZE = 6;
+	static String[] endSide = new String[END_SIDE_SIZE];
+	static String[] startSide = new String[START_SIDE_SIZE];
+	static String[] boat = new String[2];
+	static String[] commands = new String[MAX_COMMANDS];
+	static boolean isBoatOnStartSide = true;
+	static List<Action> curList = new LinkedList<Action>();
+	static List<Action> pastList = new LinkedList<Action>();
+	static boolean noError = true;
+
+	static LinkedList<Node> list = new LinkedList<Node>();
+	static Node initialNode = new Node(3, 3, 0, 0, true, null);
+
+	public static void main(String[] args) {
+		list.add(initialNode);
+
+		while (true) {
+			Node testNode = list.pop();
+			if (!isDone(testNode)) {
+				if (testNode.isOnRightSide) {
+					list.add(new Node(testNode.cr - 1, testNode.mr,
+							testNode.cl + 1, testNode.ml, false, testNode
+									.toString()));
+					list.add(new Node(testNode.cr, testNode.mr - 1,
+							testNode.cl, testNode.ml + 1, false, testNode
+									.toString()));
+					list.add(new Node(testNode.cr - 2, testNode.mr,
+							testNode.cl + 2, testNode.ml, false, testNode
+									.toString()));
+					list.add(new Node(testNode.cr, testNode.mr - 2,
+							testNode.cl, testNode.ml + 2, false, testNode
+									.toString()));
+					list.add(new Node(testNode.cr - 1, testNode.mr - 1,
+							testNode.cl + 1, testNode.ml + 1, false, testNode
+									.toString()));
+				} else if (!testNode.isOnRightSide) {
+					list.add(new Node(testNode.cr + 1, testNode.mr,
+							testNode.cl - 1, testNode.ml, true, testNode
+									.toString()));
+					list.add(new Node(testNode.cr, testNode.mr + 1,
+							testNode.cl, testNode.ml - 1, true, testNode
+									.toString()));
+					list.add(new Node(testNode.cr + 2, testNode.mr,
+							testNode.cl - 2, testNode.ml, true, testNode
+									.toString()));
+					list.add(new Node(testNode.cr, testNode.mr + 2,
+							testNode.cl, testNode.ml - 2, true, testNode
+									.toString()));
+					list.add(new Node(testNode.cr + 1, testNode.mr + 1,
+							testNode.cl - 1, testNode.ml - 1, true, testNode
+									.toString()));
+				}
+
+			} else {
+				System.out.println("DONE" + testNode.toString());
+			}
+		}
+	}
+
+	private static boolean isDone(Node n) {
+
+		if (n.cl == 3 && n.ml == 3) {
+			return true;
+		}
+		return false;
+	}
+}

@@ -1,0 +1,16 @@
+
+public class Node {
+	int ml, mr, cl, cr;
+	boolean isOnRightSide;
+	
+	public Node(int cr, int mr, int cl, int ml, boolean b) {
+		this.ml = ml;
+		this.mr = mr;
+		this.cl = cl;
+		this.cr = cr;
+		this.isOnRightSide = b;
+	}
+	
+	
+	
+}

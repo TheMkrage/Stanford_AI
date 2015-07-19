@@ -1,0 +1,6 @@
+
+public class Action {
+	static String[] endSide = new String[6];
+	static String[] startSide = new String[6];
+	static String[] boat = new String[2];
+}
