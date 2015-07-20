@@ -11,4 +11,5 @@
 <fullyQualifiedTypeName name="java.util.PriorityQueue"/>
 <fullyQualifiedTypeName name="java.lang.ArrayStoreException"/>
 <fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="org.webcrawler.bytes.ByteCounter"/>
 </qualifiedTypeNameHistroy>
