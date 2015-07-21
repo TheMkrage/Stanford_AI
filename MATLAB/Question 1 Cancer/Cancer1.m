@@ -1,35 +1,39 @@
+[data, varnames, casenames] = tblread('training_set.tab', '\t');
 
-x = tdfread('training_set.tab')
-w = struct2table(x)
-colnames = w.Properties.VariableNames
-rownames = w.Properties.RowNames
-colnames{1,5}
+zerocount = 0;
+zerosum = 0;
+onecount = 0;
+onesum = 0;
 
-zerocount = 0
-zerosum = 0
-onecount = 0
-onesum = 0
-for rowCount = 2: 132
-    for colCount = 2: 4400
-        
-        sl = length(colnames{1,colCount})
-        pl = 1
-        s = colnames{1,colCount}
-        pat = '0'
-
-        if (sl >= pl && strcmp(s(sl-pl+1:sl), pat)) || isempty(pat);
-            zerocount = zerocount + 1
-            zerosum = zerosum + w{rowCount, colCount}
-            zeroArray{1, zerocount} = w{rowCount, colCount}
-        else
-           onecount = onecount + 1 
-           onesum = onesum + w{rowCount, colCount}
-           oneArray{1, onecount} = w{rowCount, colCount}
-        end
-        
+lowesthighvalue = 1;
+highestlowvalue = 1;
+for colCount = 1: length(varnames)
+    if strcmp(varnames(colCount,6), '0')
+        zerocount = zerocount + 1;
+    else
+        onecount = onecount + 1 ;
     end
-    
 end
+
+for rowCount = 1: 4399
+    zerosum = 0;
+    onesum = 0;
+    zeroarray = zeros(1, 1);
+    onearray = zeros(1, 1);
+    for colCount = 1: 131
+        if strcmp(varnames(colCount,6), '0')
+            zerosum = zerosum + data(rowCount, colCount);
+            zeroarray(rowCount) = data(rowCount, colCount);
+        else
+            onesum = onesum + data(rowCount, colCount);
+            onearray(rowCount) = data(rowCount, colCount);
+        end
+    end
+    fisher(rowCount, 1) = rowCount;
+    fisher(rowCount, 2) = ((onesum/onecount) - (zerosum/zerocount)) / (( var(zeroarray, 1) + var(onearray, 1) ));
+end
+fisher = sortrows(fisher, 2);
+fisher
 %w(4, 5)
 
 
