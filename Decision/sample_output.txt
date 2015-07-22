@@ -1,0 +1,18 @@
+There is no one set format for this. 
+
+In general, you want to print out the tree with indentation signifying the 
+node's level in the tree.
+
+You should also print out the test that is being performed at each node and 
+the classification if it's a leaf node. 
+
+Here's an example of a possible format, where "shape", "age", and "color" 
+are example features and the classifications are '+' or '-':
+shape = circle:
+  age = young:  +
+  age = old:
+    color = red: - 
+    color = green: +
+shape = square:
+  color = red: +
+  color = green: -
