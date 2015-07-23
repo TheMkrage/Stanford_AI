@@ -55,7 +55,7 @@ import java.io.*;
 public class BuildAndTestDecisionTree {
 	// "Main" reads in the names of the files we want to use, then reads
 	// in their examples.
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		if (args.length != 2) {
 			System.err.println("You must call BuildAndTestDecisionTree as "
 					+ "follows:\n\njava BuildAndTestDecisionTree "
@@ -92,19 +92,36 @@ public class BuildAndTestDecisionTree {
 			 * debugging you might wish to print out the full example to see if
 			 * it was processed correctly by your decision tree)
 			 */
-			LinkedList<ListOfExamples> listOfTrees = new LinkedList<ListOfExamples>();
+			Queue<ListOfExamples> listOfTrees = new LinkedList<ListOfExamples>();
 			listOfTrees.add(trainExamples);
+			System.out.println("YES SET: " + trainExamples.size()
+					+ " NO SET: " + trainExamples.size());
 			while (!listOfTrees.isEmpty()) {
-				BinaryFeature best = new BinaryFeature(" ", " ", " ", 0);
-				ListOfExamples currentSet = listOfTrees.pop();
+				BinaryFeature best = new BinaryFeature(" ", " ", " ", -98);
+				ListOfExamples currentSet = listOfTrees.poll();
+				// System.out.println(currentSet);
+				ListOfExamples possibleYesSet = new ListOfExamples(
+						currentSet.getNumberOfFeatures());
+				ListOfExamples possibleNoSet = new ListOfExamples(
+						currentSet.getNumberOfFeatures());
+				ListOfExamples currentYesSet = new ListOfExamples(
+						currentSet.getNumberOfFeatures());
+				ListOfExamples currentNoSet = new ListOfExamples(
+						currentSet.getNumberOfFeatures());
 				for (int i = 0; i < currentSet.getNumberOfFeatures(); i++) {
 					String currentFeature = currentSet.getFeatureName(i);
+					possibleNoSet = new ListOfExamples(
+							currentSet.getNumberOfFeatures());
+					possibleYesSet = new ListOfExamples(
+							currentSet.getNumberOfFeatures());
 					double yesCount = 0, noCount = 0;
 					double yesDemCount = 0, yesRepCount = 0, noDemCount = 0, noRepCount = 0;
 					double demCount = 0, repCount = 0; // Yes, it counts every
 					for (int k = 0; k < currentSet.size(); k++) {
 						Example currentExample = currentSet.get(k);
-						if (currentExample.get(i).equals("y")) {
+						currentExample.setParent(currentSet);
+						if (currentExample.get(i).equals("y")) {				
+							possibleYesSet.add(currentExample);
 							yesCount++;
 							if (currentExample.getLabel().equals("republican")) {
 								repCount++;
@@ -115,6 +132,7 @@ public class BuildAndTestDecisionTree {
 								yesDemCount++;
 							}
 						} else if (currentExample.get(i).equals("n")) {
+							possibleNoSet.add(currentExample);
 							noCount++;
 							if (currentExample.getLabel().equals("republican")) {
 								repCount++;
@@ -144,18 +162,24 @@ public class BuildAndTestDecisionTree {
 								infoGain);
 						best.setYesCount((int) yesCount);
 						best.setNoCount((int) noCount);
+						currentYesSet = possibleYesSet;
+						currentNoSet = possibleNoSet;
 						// System.out.println("INFO GAIN IS: " + infoGain
 						// + "ENTROPY: " + entropy + " CONDITIONAL ENTROPY: "
 						// + conditionalEntropy);
 					}
 				}
 				System.out.println(best.getName() + " IS THE BEST ATTRIBUTE! ");
-				// Make new Set for the next part of tree
-				ListOfExamples tempSetYes = new ListOfExamples();
-				ListOfExamples tempSetNo = new ListOfExamples();
-				for (int i = 0; i < best.getYesCount(); i++) {
-
+				if (best.getInfoGain() != -98
+						|| (best.getNoCount() == 0 || best.getYesCount() == 0)) {
+					currentYesSet.setFeatureName(currentSet.getFeatures());
+					currentNoSet.setFeatureName(currentSet.getFeatures());
+					System.out.println("YES SET: " + currentYesSet.size()
+							+ " NO SET: " + currentNoSet.size());
+					listOfTrees.add(currentYesSet);
+					listOfTrees.add(currentNoSet);
 				}
+				Thread.sleep(2000);
 			}
 
 			// testExamples.DescribeDataset();
@@ -200,6 +224,10 @@ class Example extends ArrayList<String> {
 	// Constructor which stores the dataset which the example belongs to.
 	public Example(ListOfExamples parent) {
 		this.parent = parent;
+	}
+
+	public void setParent(ListOfExamples currentSet) {
+		this.parent = currentSet;
 	}
 
 	// Print out this example in human-readable form.
@@ -258,6 +286,10 @@ class ListOfExamples extends ArrayList<Example> {
 	// The number of examples in the dataset.
 	private int numExamples = -1;
 
+	public ListOfExamples(int features) {
+		numFeatures = features;
+	}
+
 	public ListOfExamples() {
 	}
 
@@ -302,6 +334,16 @@ class ListOfExamples extends ArrayList<Example> {
 	// Returns the name of the ith feature.
 	public String getFeatureName(int i) {
 		return features[i].getName();
+	}
+
+	// Set features
+	public void setFeatureName(BinaryFeature[] i) {
+		this.features = i;
+	}
+
+	// Set features
+	public BinaryFeature[] getFeatures() {
+		return this.features;
 	}
 
 	// Takes the name of an input file and attempts to open it for parsing.
