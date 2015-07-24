@@ -92,10 +92,14 @@ public class BuildAndTestDecisionTree {
 			 * debugging you might wish to print out the full example to see if
 			 * it was processed correctly by your decision tree)
 			 */
+			int currentID = 1;
+			DecisionTree tree = new DecisionTree();
+			Queue<BinaryFeature> listOfCompletedNodes = new LinkedList<BinaryFeature>();
 			Queue<ListOfExamples> listOfTrees = new LinkedList<ListOfExamples>();
+			trainExamples.setAnswerID(0);
 			listOfTrees.add(trainExamples);
-			System.out.println("YES SET: " + trainExamples.size()
-					+ " NO SET: " + trainExamples.size());
+			System.out.println("YES SET: " + trainExamples.size() + " NO SET: "
+					+ trainExamples.size());
 			while (!listOfTrees.isEmpty()) {
 				BinaryFeature best = new BinaryFeature(" ", " ", " ", -98);
 				ListOfExamples currentSet = listOfTrees.poll();
@@ -120,7 +124,7 @@ public class BuildAndTestDecisionTree {
 					for (int k = 0; k < currentSet.size(); k++) {
 						Example currentExample = currentSet.get(k);
 						currentExample.setParent(currentSet);
-						if (currentExample.get(i).equals("y")) {				
+						if (currentExample.get(i).equals("y")) {
 							possibleYesSet.add(currentExample);
 							yesCount++;
 							if (currentExample.getLabel().equals("republican")) {
@@ -162,6 +166,8 @@ public class BuildAndTestDecisionTree {
 								infoGain);
 						best.setYesCount((int) yesCount);
 						best.setNoCount((int) noCount);
+						best.setYesNoDemRup(yesDemCount, yesRepCount,
+								noDemCount, noRepCount, demCount, repCount);
 						currentYesSet = possibleYesSet;
 						currentNoSet = possibleNoSet;
 						// System.out.println("INFO GAIN IS: " + infoGain
@@ -169,17 +175,34 @@ public class BuildAndTestDecisionTree {
 						// + conditionalEntropy);
 					}
 				}
-				System.out.println(best.getName() + " IS THE BEST ATTRIBUTE! ");
+
 				if (best.getInfoGain() != -98
-						|| (best.getNoCount() == 0 || best.getYesCount() == 0)) {
+						|| (best.getNoCount() != 0 && best.getYesCount() != 0)) {
+					System.out.println(best.getName()
+							+ " IS THE BEST ATTRIBUTE! ");
 					currentYesSet.setFeatureName(currentSet.getFeatures());
 					currentNoSet.setFeatureName(currentSet.getFeatures());
+					
 					System.out.println("YES SET: " + currentYesSet.size()
 							+ " NO SET: " + currentNoSet.size());
+					//BinaryFeature[] temp = {currentYesSet, currentNoSet};
+					int parentID = currentID;
+					System.out.println("PARENT: " + currentSet.getAnswerID() + " NEW ID: " + parentID);
+					tree.addNewInternalNode(currentSet.getAnswerID(), parentID, best.getName(), 2);
+					currentID++;
+					tree.addNewLeafNode(parentID, currentID, "y");
+					currentYesSet.setAnswerID(currentID);
+					currentID++;
+					tree.addNewLeafNode(parentID, currentID, "n");
+					currentNoSet.setAnswerID(currentID);
+					currentID++;
+					listOfCompletedNodes.add(best);
+					
+					
 					listOfTrees.add(currentYesSet);
 					listOfTrees.add(currentNoSet);
 				}
-				Thread.sleep(2000);
+				Thread.sleep(10);
 			}
 
 			// testExamples.DescribeDataset();
@@ -189,6 +212,11 @@ public class BuildAndTestDecisionTree {
 			// of this out!
 			// testExamples.PrintAllExamples(); // Instead, just view it on the
 			// screen
+			/*for ( BinaryFeature b: listOfCompletedNodes) {
+				if (b.getDemCount() == 0 || b.getRepCount())
+			}*/
+			tree.print();
+			
 		}
 
 		Utilities.waitHere("Hit <enter> when ready to exit.");
@@ -285,9 +313,23 @@ class ListOfExamples extends ArrayList<Example> {
 
 	// The number of examples in the dataset.
 	private int numExamples = -1;
+	
+	private int answerID = 0;
+
+	public int getAnswerID() {
+		return answerID;
+	}
+
+	public void setAnswerID(int answerID) {
+		this.answerID = answerID;
+	}
 
 	public ListOfExamples(int features) {
 		numFeatures = features;
+	}
+
+	public void setFeatures(BinaryFeature[] features) {
+		this.features = features;
 	}
 
 	public ListOfExamples() {
@@ -508,12 +550,56 @@ class ListOfExamples extends ArrayList<Example> {
  * Represents a single binary feature with two String values.
  */
 class BinaryFeature {
+	public double getDemCount() {
+		return demCount;
+	}
+
+	public void setDemCount(double demCount) {
+		this.demCount = demCount;
+	}
+
+	public double getRepCount() {
+		return repCount;
+	}
+
+	public void setRepCount(double repCount) {
+		this.repCount = repCount;
+	}
+
 	private String name;
 	private String firstValue;
 	private String secondValue;
 	private double infoGain;
 	private int yesCount;
 	private int noCount;
+	private double yesDemCount = 0, yesRepCount = 0, noDemCount = 0,
+			noRepCount = 0;
+	private double demCount = 0, repCount = 0; // Yes, it counts every
+	private BinaryFeature[] children;
+
+	public void setYesNoDemRup(double yesDemCount, double yesRepCount,
+			double noDemCount, double noRepCount, double demCount,
+			double repCount) {
+		this.yesDemCount = yesDemCount;
+		this.yesRepCount = yesRepCount;
+		this.noDemCount = noDemCount;
+		this.noRepCount = noRepCount;
+		this.demCount = demCount;
+		this.repCount = repCount;
+	}
+
+	public BinaryFeature[] getChildren() {
+		return children;
+	}
+
+	public void setChildren(BinaryFeature[] children) {
+		this.children = children;
+	}
+
+	public String toString() {
+		return "NAME: " + name + " yes Count: " + yesCount + " no Count: "
+				+ noCount;
+	}
 
 	public int getYesCount() {
 		return yesCount;
@@ -536,6 +622,7 @@ class BinaryFeature {
 		firstValue = first;
 		secondValue = second;
 		infoGain = 0;
+		children = new BinaryFeature[2];
 	}
 
 	public double getInfoGain() {
@@ -548,6 +635,7 @@ class BinaryFeature {
 		firstValue = first;
 		secondValue = second;
 		this.infoGain = infoGain;
+		children = new BinaryFeature[2];
 	}
 
 	public String getName() {
