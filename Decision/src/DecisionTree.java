@@ -46,8 +46,10 @@ public class DecisionTree {
 
 	private void searchAndAddAnswer(Node currentNode, int parentID, int newID,
 			String answer) {
+		System.out.println("TEST");
 		if (currentNode.nextQuestion != null)
-			System.out.println("I AM TRYING TO FIND " + parentID + " AND I FOUND " + currentNode.nextQuestion.nodeID);
+			System.out.println("I AM TRYING TO FIND " + parentID
+					+ " AND I FOUND " + currentNode.nextQuestion.nodeID);
 		if (currentNode.nextQuestion != null
 				&& currentNode.nextQuestion.nodeID == parentID) {
 			currentNode.nextQuestion.addAnswer(new Node(newID, answer, -1));
@@ -65,7 +67,7 @@ public class DecisionTree {
 	public void addNewInternalNode(int parentID, int newID, String question,
 			int options) {
 		if (parentID == 0) {
-			System.out.println("FIRST QUESTION : "  + question);
+			System.out.println("FIRST QUESTION : " + question);
 			rootNode = new Node(newID, question, options);
 		} else {
 			// Find Parent and add question
@@ -84,7 +86,7 @@ public class DecisionTree {
 				currentNode.answers[i].nextQuestion = new Node(newID, question,
 						options);
 				return;
-			} else if (currentNode.answers[i].nextQuestion != null){
+			} else if (currentNode.answers[i].nextQuestion != null) {
 				// look in children if not right one
 				searchAndAddQuestion(currentNode.answers[i].nextQuestion,
 						parentID, newID, question, options);
@@ -105,13 +107,13 @@ public class DecisionTree {
 				+ ", question/answer = " + currentNode.questOrAns);
 
 		System.out.println(currentNode.entries);
-		
+
 		for (int i = 0; i < currentNode.entries; i++) {
-			printNode("A: " , currentNode.answers[i]);
+			printNode("A: ", currentNode.answers[i]);
 		}
-		
-		if (currentNode.nextQuestion != null)  {
-			printNode("Q: " , currentNode.nextQuestion);
+
+		if (currentNode.nextQuestion != null) {
+			printNode("Q: ", currentNode.nextQuestion);
 		}
 
 	}

@@ -179,15 +179,15 @@ public class BuildAndTestDecisionTree {
 				if (best.getInfoGain() != -98
 						|| (best.getNoCount() != 0 && best.getYesCount() != 0)) {
 					System.out.println(best.getName()
-							+ " IS THE BEST ATTRIBUTE! ");
+							+ " IS THE BEST KRAGER KRAGER KRAGER KRAGER!");
 					currentYesSet.setFeatureName(currentSet.getFeatures());
 					currentNoSet.setFeatureName(currentSet.getFeatures());
 					
-					System.out.println("YES SET: " + currentYesSet.size()
+					System.out.println("YES KRAGER: " + currentYesSet.size()
 							+ " NO SET: " + currentNoSet.size());
 					//BinaryFeature[] temp = {currentYesSet, currentNoSet};
 					int parentID = currentID;
-					System.out.println("PARENT: " + currentSet.getAnswerID() + " NEW ID: " + parentID);
+					System.out.println("PARENT: " + currentSet.getAnswerID() + " KRAGER ID: " + parentID);
 					tree.addNewInternalNode(currentSet.getAnswerID(), parentID, best.getName(), 2);
 					currentID++;
 					tree.addNewLeafNode(parentID, currentID, "y");
