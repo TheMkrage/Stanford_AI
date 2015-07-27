@@ -182,23 +182,30 @@ public class BuildAndTestDecisionTree {
 							+ " IS THE BEST KRAGER KRAGER KRAGER KRAGER!");
 					currentYesSet.setFeatureName(currentSet.getFeatures());
 					currentNoSet.setFeatureName(currentSet.getFeatures());
-					
 					System.out.println("YES KRAGER: " + currentYesSet.size()
 							+ " NO SET: " + currentNoSet.size());
-					//BinaryFeature[] temp = {currentYesSet, currentNoSet};
 					int parentID = currentID;
-					System.out.println("PARENT: " + currentSet.getAnswerID() + " KRAGER ID: " + parentID);
-					tree.addNewInternalNode(currentSet.getAnswerID(), parentID, best.getName(), 2);
+					System.out.println("PARENT: " + currentSet.getAnswerID()
+							+ " KRAGER ID: " + parentID);
+					tree.addNewInternalNode(currentSet.getAnswerID(), parentID,
+							best.getName(), 2);
 					currentID++;
-					tree.addNewLeafNode(parentID, currentID, "y");
+					String[][] yesAnswers = {
+							{ "Dem:", Double.toString(best.getYesDemCount()) },
+							{ "Rep:" , Double.toString(best.getYesRepCount()) } };
+					tree.addNewLeafNode(parentID, currentID,
+							"y " + best.getName(), yesAnswers);
 					currentYesSet.setAnswerID(currentID);
 					currentID++;
-					tree.addNewLeafNode(parentID, currentID, "n");
+					String[][] noAnswers = {
+							{ "Dem:", Double.toString(best.getNoDemCount()) },
+							{ "Rep:" , Double.toString(best.getNoRepCount()) } };
+					tree.addNewLeafNode(parentID, currentID,
+							"n " + best.getName(), noAnswers);
 					currentNoSet.setAnswerID(currentID);
 					currentID++;
 					listOfCompletedNodes.add(best);
-					
-					
+
 					listOfTrees.add(currentYesSet);
 					listOfTrees.add(currentNoSet);
 				}
@@ -212,11 +219,12 @@ public class BuildAndTestDecisionTree {
 			// of this out!
 			// testExamples.PrintAllExamples(); // Instead, just view it on the
 			// screen
-			/*for ( BinaryFeature b: listOfCompletedNodes) {
-				if (b.getDemCount() == 0 || b.getRepCount())
-			}*/
+			/*
+			 * for ( BinaryFeature b: listOfCompletedNodes) { if
+			 * (b.getDemCount() == 0 || b.getRepCount()) }
+			 */
 			tree.print();
-			
+
 		}
 
 		Utilities.waitHere("Hit <enter> when ready to exit.");
@@ -313,7 +321,7 @@ class ListOfExamples extends ArrayList<Example> {
 
 	// The number of examples in the dataset.
 	private int numExamples = -1;
-	
+
 	private int answerID = 0;
 
 	public int getAnswerID() {
@@ -586,6 +594,38 @@ class BinaryFeature {
 		this.noRepCount = noRepCount;
 		this.demCount = demCount;
 		this.repCount = repCount;
+	}
+
+	public double getYesDemCount() {
+		return yesDemCount;
+	}
+
+	public void setYesDemCount(double yesDemCount) {
+		this.yesDemCount = yesDemCount;
+	}
+
+	public double getYesRepCount() {
+		return yesRepCount;
+	}
+
+	public void setYesRepCount(double yesRepCount) {
+		this.yesRepCount = yesRepCount;
+	}
+
+	public double getNoDemCount() {
+		return noDemCount;
+	}
+
+	public void setNoDemCount(double noDemCount) {
+		this.noDemCount = noDemCount;
+	}
+
+	public double getNoRepCount() {
+		return noRepCount;
+	}
+
+	public void setNoRepCount(double noRepCount) {
+		this.noRepCount = noRepCount;
 	}
 
 	public BinaryFeature[] getChildren() {
