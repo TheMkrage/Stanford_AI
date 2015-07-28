@@ -100,9 +100,11 @@ public class BuildAndTestDecisionTree {
 			listOfTrees.add(trainExamples);
 			System.out.println("YES SET: " + trainExamples.size() + " NO SET: "
 					+ trainExamples.size());
+			trainExamples.DescribeDataset();
 			while (!listOfTrees.isEmpty()) {
-				BinaryFeature best = new BinaryFeature(" ", " ", " ", -98);
+				BinaryFeature best = new BinaryFeature(" ", " ", " ", Integer.MIN_VALUE);
 				ListOfExamples currentSet = listOfTrees.poll();
+				System.out.println(currentSet);
 				// System.out.println(currentSet);
 				ListOfExamples possibleYesSet = new ListOfExamples(
 						currentSet.getNumberOfFeatures());
@@ -114,6 +116,7 @@ public class BuildAndTestDecisionTree {
 						currentSet.getNumberOfFeatures());
 				for (int i = 0; i < currentSet.getNumberOfFeatures(); i++) {
 					String currentFeature = currentSet.getFeatureName(i);
+					System.out.println("Testing " + currentFeature);
 					possibleNoSet = new ListOfExamples(
 							currentSet.getNumberOfFeatures());
 					possibleYesSet = new ListOfExamples(
@@ -176,7 +179,7 @@ public class BuildAndTestDecisionTree {
 					}
 				}
 
-				if (best.getInfoGain() != -98
+				if (best.getInfoGain() != Integer.MIN_VALUE
 						|| (best.getNoCount() != 0 && best.getYesCount() != 0)) {
 					System.out.println(best.getName()
 							+ " IS THE BEST KRAGER KRAGER KRAGER KRAGER!");
@@ -192,14 +195,14 @@ public class BuildAndTestDecisionTree {
 					currentID++;
 					String[][] yesAnswers = {
 							{ "Dem:", Double.toString(best.getYesDemCount()) },
-							{ "Rep:" , Double.toString(best.getYesRepCount()) } };
+							{ "Rep:", Double.toString(best.getYesRepCount()) } };
 					tree.addNewLeafNode(parentID, currentID,
 							"y " + best.getName(), yesAnswers);
 					currentYesSet.setAnswerID(currentID);
 					currentID++;
 					String[][] noAnswers = {
 							{ "Dem:", Double.toString(best.getNoDemCount()) },
-							{ "Rep:" , Double.toString(best.getNoRepCount()) } };
+							{ "Rep:", Double.toString(best.getNoRepCount()) } };
 					tree.addNewLeafNode(parentID, currentID,
 							"n " + best.getName(), noAnswers);
 					currentNoSet.setAnswerID(currentID);
@@ -208,6 +211,10 @@ public class BuildAndTestDecisionTree {
 
 					listOfTrees.add(currentYesSet);
 					listOfTrees.add(currentNoSet);
+				} else {
+					if (best != null)
+						System.out.println("BEST: " + best + " " + best.getInfoGain());
+					
 				}
 				Thread.sleep(10);
 			}
@@ -224,7 +231,8 @@ public class BuildAndTestDecisionTree {
 			 * (b.getDemCount() == 0 || b.getRepCount()) }
 			 */
 			tree.print();
-
+			// Time to use on test
+			System.out.println(tree.giveMeAnswer(testExamples, testExamples.getFeatures()));
 		}
 
 		Utilities.waitHere("Hit <enter> when ready to exit.");
